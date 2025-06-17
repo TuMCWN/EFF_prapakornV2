@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Line Efficiency Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h3::before {
+            content: "📊";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .sam-display {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #8b4513;
+            font-size: 1.1rem;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e1f5fe;
+        }
+
+        .current-efficiency {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .efficiency-value {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .efficiency-label {
+            color: #666;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .target-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .target-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .target-percentage {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .target-pieces {
+            font-size: 1.1rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .target-difference {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Production Line Efficiency</h1>
+            <p>คำนวณประสิทธิภาพการผลิตแบบเรียลไทม์</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <h3>ข้อมูลการทำงาน</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="workHours">ชั่วโมงทำงานปกติ</label>
+                        <select id="workHours">
+                            <option value="4">4 ชั่วโมง</option>
+                            <option value="8" selected>8 ชั่วโมง</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="otHours">ชั่วโมงล่วงเวลา (OT)</label>
+                        <select id="otHours">
+                            <option value="0" selected>ไม่มี OT</option>
+                            <option value="1">1 ชั่วโมง</option>
+                            <option value="2">2 ชั่วโมง</option>
+                            <option value="3">3 ชั่วโมง</option>
+                            <option value="4">4 ชั่วโมง</option>
+                            <option value="5">5 ชั่วโมง</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regularWorkers">จำนวนพนักงานทำงานปกติ</label>
+                        <input type="number" id="regularWorkers" placeholder="จำนวนพนักงาน" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="otWorkers">จำนวนพนักงาน OT</label>
+                        <input type="number" id="otWorkers" placeholder="จำนวนพนักงาน OT" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>ข้อมูลงานผลิต</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="styleSelect">เลือก Style งาน</label>
+                        <select id="styleSelect">
+                            <option value="">-- เลือก Style --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ค่า SAM</label>
+                        <div id="samDisplay" class="sam-display">กรุณาเลือก Style</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="production">จำนวนชิ้นที่ผลิตได้</label>
+                        <input type="number" id="production" placeholder="จำนวนชิ้น" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateEfficiency()">
+                🚀 คำนวณประสิทธิภาพ
+            </button>
+
+            <div class="loading" id="loading">
+                <p>กำลังคำนวณ...</p>
+            </div>
+
+            <div class="results hidden" id="results">
+                <div class="current-efficiency">
+                    <div class="efficiency-value" id="currentEff">0%</div>
+                    <div class="efficiency-label">ประสิทธิภาพปัจจุบัน</div>
+                </div>
+
+                <h4 style="text-align: center; margin-bottom: 20px; color: #333;">
+                    🎯 เป้าหมายประสิทธิภาพ - จำนวนชิ้นที่ต้องผลิตเพิ่ม
+                </h4>
+                <div class="targets-grid" id="targetsGrid">
+                    <!-- Target cards will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - ในการใช้งานจริงจะเชื่อมต่อกับ Google Sheets
+        const sampleStyleData = [
+            { style: "FEPC4831R", sam: 3.49 },
+            { style: "FEPC4831R (ตราผ้า)", sam: 3.69 },
+            { style: "FEPC4994M", sam: 3.57 },
+            { style: "FEPC5608", sam: 3.61 },
+            { style: "FEPC7290", sam: 3.76 },
+            { style: "JB2871", sam: 18.95 },
+            { style: "JB2876", sam: 21.38 },
+            { style: "JBG101", sam: 9.85 },
+            { style: "JUP003", sam: 3.09 },
+            { style: "JUP005", sam: 3.81 },
+        ];
+
+        // Initialize the app
+        function initializeApp() {
+            loadStyleData();
+            setupEventListeners();
+        }
+
+        // Load style data into dropdown
+        function loadStyleData() {
+            const styleSelect = document.getElementById('styleSelect');
+            styleSelect.innerHTML = '<option value="">-- เลือก Style --</option>';
+            
+            sampleStyleData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.sam;
+                option.textContent = item.style;
+                option.dataset.sam = item.sam;
+                styleSelect.appendChild(option);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('styleSelect').addEventListener('change', function() {
+                const samDisplay = document.getElementById('samDisplay');
+                if (this.value) {
+                    samDisplay.textContent = `SAM: ${this.value} นาที`;
+                    samDisplay.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
+                } else {
+                    samDisplay.textContent = 'กรุณาเลือก Style';
+                    samDisplay.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
+                }
+            });
+
+            // Auto-disable OT workers when OT hours is 0
+            document.getElementById('otHours').addEventListener('change', function() {
+                const otWorkersInput = document.getElementById('otWorkers');
+                if (this.value === '0') {
+                    otWorkersInput.value = '0';
+                    otWorkersInput.disabled = true;
+                } else {
+                    otWorkersInput.disabled = false;
+                }
+            });
+        }
+
+        // Calculate efficiency
+        function calculateEfficiency() {
+            const workHours = parseFloat(document.getElementById('workHours').value);
+            const otHours = parseFloat(document.getElementById('otHours').value);
+            const regularWorkers = parseInt(document.getElementById('regularWorkers').value);
+            const otWorkers = parseInt(document.getElementById('otWorkers').value) || 0;
+            const sam = parseFloat(document.getElementById('styleSelect').value);
+            const production = parseInt(document.getElementById('production').value);
+
+            // Validation
+            if (!regularWorkers || !sam || !production) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').classList.add('hidden');
+
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Calculate total working minutes
+                const regularMinutes = regularWorkers * workHours * 60;
+                const otMinutes = otWorkers * otHours * 60;
+                const totalMinutes = regularMinutes + otMinutes;
+
+                // Calculate current efficiency
+                const currentEfficiency = (sam * production / totalMinutes) * 100;
+
+                // Display current efficiency
+                document.getElementById('currentEff').textContent = currentEfficiency.toFixed(2) + '%';
+
+                // Calculate targets
+                calculateTargets(sam, totalMinutes, production, currentEfficiency);
+
+                // Show results
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').classList.remove('hidden');
+            }, 1000);
+        }
+
+        // Calculate target pieces needed for different efficiency levels
+        function calculateTargets(sam, totalMinutes, currentProduction, currentEff) {
+            const targets = [75, 80, 85, 90, 95, 100];
+            const targetsGrid = document.getElementById('targetsGrid');
+            targetsGrid.innerHTML = '';
+
+            targets.forEach(targetEff => {
+                const requiredPieces = Math.ceil((targetEff * totalMinutes) / (sam * 100));
+                const additionalPieces = Math.max(0, requiredPieces - currentProduction);
+                
+                const card = document.createElement('div');
+                card.className = 'target-card';
+                
+                let cardStyle = 'background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);';
+                if (currentEff >= targetEff) {
+                    cardStyle = 'background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);';
+                } else if (additionalPieces > 0 && additionalPieces <= 10) {
+                    cardStyle = 'background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);';
+                }
+                
+                card.style.cssText = cardStyle;
+                
+                card.innerHTML = `
+                    <div class="target-percentage">${targetEff}%</div>
+                    <div class="target-pieces">
+                        ${currentEff >= targetEff ? '✅ ผ่าน' : `+${additionalPieces} ชิ้น`}
+                    </div>
+                    <div class="target-difference">
+                        ${currentEff >= targetEff ? 
+                            `เกิน ${(currentEff - targetEff).toFixed(1)}%` : 
+                            `ต้องการรวม ${requiredPieces} ชิ้น`
+                        }
+                    </div>
+                `;
+                
+                targetsGrid.appendChild(card);
+            });
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Google Apps Script functions (for actual implementation)
+        /*
+        function getStyleData() {
+            const sheet = SpreadsheetApp.openById('1gRFLcJ0gHtgNvruVs2UucAR4e5XBwkKLLpgP-NooyXM').getSheetByName('SAM');
+            const data = sheet.getDataRange().getValues();
+            const styleData = [];
+            
+            for (let i = 1; i < data.length; i++) { // Skip header row
+                styleData.push({
+                    style: data[i][0],
+                    sam: data[i][1]
+                });
+            }
+            
+            return styleData;
+        }
+
+        function saveCalculationData(calculationData) {
+            const sheet = SpreadsheetApp.openById('1gRFLcJ0gHtgNvruVs2UucAR4e5XBwkKLLpgP-NooyXM').getSheetByName('Cal');
+            const newRow = [
+                calculationData.otHours,
+                calculationData.regularWorkers,
+                calculationData.otWorkers,
+                '', // Column D empty
+                calculationData.selectedStyle,
+                calculationData.sam,
+                calculationData.production,
+                calculationData.sam * calculationData.production,
+                calculationData.efficiency
+            ];
+            sheet.appendRow(newRow);
+        }
+        */
+    </script>
+</body>
+</html>
