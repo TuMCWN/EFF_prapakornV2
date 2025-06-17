@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -232,6 +232,110 @@
             display: none;
         }
 
+        .style-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .style-container h4 {
+            margin-bottom: 15px;
+            color: #444;
+            display: flex;
+            align-items: center;
+        }
+
+        .style-container h4::before {
+            content: "👕";
+            margin-right: 10px;
+        }
+
+        .remove-style-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .add-style-btn {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .add-style-btn:hover {
+            background: #3a8fd9;
+        }
+
+        .add-style-btn::before {
+            content: "+";
+            margin-right: 5px;
+            font-size: 1.2em;
+        }
+
+        .style-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .style-result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e1e5e9;
+        }
+
+        .style-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .style-result-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .style-result-sam {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .style-result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            color: #4facfe;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -251,6 +355,10 @@
             }
             
             .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .style-results {
                 grid-template-columns: 1fr;
             }
         }
@@ -298,26 +406,35 @@
                 </div>
             </div>
 
-            <div class="form-section">
-                <h3>ข้อมูลงานผลิต</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="styleSelect">เลือก Style งาน</label>
-                        <select id="styleSelect">
-                            <option value="">-- เลือก Style --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>ค่า SAM</label>
-                        <div id="samDisplay" class="sam-display">กรุณาเลือก Style</div>
+            <div class="form-section" id="stylesSection">
+                <h3>ข้อมูลงานผลิต (เพิ่มได้สูงสุด 3 Style)</h3>
+                
+                <div id="styleContainers">
+                    <!-- Style containers will be added here -->
+                    <div class="style-container" data-style-index="0">
+                        <h4>Style งาน #1</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="styleSelect0">เลือก Style งาน</label>
+                                <select class="style-select" id="styleSelect0">
+                                    <option value="">-- เลือก Style --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>ค่า SAM</label>
+                                <div class="sam-display" id="samDisplay0">กรุณาเลือก Style</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="production0">จำนวนชิ้นที่ผลิตได้</label>
+                                <input type="number" class="production-input" id="production0" placeholder="จำนวนชิ้น" min="0">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="production">จำนวนชิ้นที่ผลิตได้</label>
-                        <input type="number" id="production" placeholder="จำนวนชิ้น" min="0">
-                    </div>
-                </div>
+                
+                <button type="button" class="add-style-btn" id="addStyleBtn">เพิ่ม Style งาน</button>
             </div>
 
             <button class="calculate-btn" onclick="calculateEfficiency()">
@@ -331,10 +448,14 @@
             <div class="results hidden" id="results">
                 <div class="current-efficiency">
                     <div class="efficiency-value" id="currentEff">0%</div>
-                    <div class="efficiency-label">ประสิทธิภาพปัจจุบัน</div>
+                    <div class="efficiency-label">ประสิทธิภาพโดยรวม</div>
                 </div>
 
-                <h4 style="text-align: center; margin-bottom: 20px; color: #333;">
+                <div id="styleResultsContainer" class="style-results">
+                    <!-- Individual style results will be inserted here -->
+                </div>
+
+                <h4 style="text-align: center; margin: 30px 0 20px; color: #333;">
                     🎯 เป้าหมายประสิทธิภาพ - จำนวนชิ้นที่ต้องผลิตเพิ่ม
                 </h4>
                 <div class="targets-grid" id="targetsGrid">
@@ -345,54 +466,89 @@
     </div>
 
     <script>
-        // Sample data - ในการใช้งานจริงจะเชื่อมต่อกับ Google Sheets
-        const sampleStyleData = [
-            { style: "FEPC4831R", sam: 3.49 },
-            { style: "FEPC4831R (ตราผ้า)", sam: 3.69 },
-            { style: "FEPC4994M", sam: 3.57 },
-            { style: "FEPC5608", sam: 3.61 },
-            { style: "FEPC7290", sam: 3.76 },
-            { style: "JB2871", sam: 18.95 },
-            { style: "JB2876", sam: 21.38 },
-            { style: "JBG101", sam: 9.85 },
-            { style: "JUP003", sam: 3.09 },
-            { style: "JUP005", sam: 3.81 },
-        ];
+        // Google Sheet ID and configuration
+        const SPREADSHEET_ID = "1gRFLcJ0gHtgNvruVs2UucAR4e5XBwkKLLpgP-NooyXM";
+        const SAM_SHEET_NAME = "SAM";
+        
+        // Initialize variables
+        let styleData = [];
+        let styleCount = 1;
+        const maxStyles = 3;
 
         // Initialize the app
-        function initializeApp() {
-            loadStyleData();
+        async function initializeApp() {
+            await loadStyleDataFromSheet();
             setupEventListeners();
+            updateAddButtonState();
         }
 
-        // Load style data into dropdown
-        function loadStyleData() {
-            const styleSelect = document.getElementById('styleSelect');
-            styleSelect.innerHTML = '<option value="">-- เลือก Style --</option>';
+        // Load style data from Google Sheet
+        async function loadStyleDataFromSheet() {
+            try {
+                // In a real implementation, this would call Google Apps Script
+                // For now, we'll use a mock function
+                styleData = await mockGetStyleDataFromSheet();
+                
+                // Initialize the first style dropdown
+                populateStyleDropdown('styleSelect0');
+            } catch (error) {
+                console.error("Error loading style data:", error);
+                alert("เกิดข้อผิดพลาดในการโหลดข้อมูล Style กรุณาลองใหม่ภายหลัง");
+            }
+        }
+        
+        // Mock function to simulate fetching data from Google Sheet
+        async function mockGetStyleDataFromSheet() {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 500));
             
-            sampleStyleData.forEach(item => {
+            // Return mock data that mimics your Google Sheet structure
+            return [
+                { style: "FEPC4831R", sam: 3.49 },
+                { style: "FEPC4831R (ตราผ้า)", sam: 3.69 },
+                { style: "FEPC4994M", sam: 3.57 },
+                { style: "FEPC5608", sam: 3.61 },
+                { style: "FEPC7290", sam: 3.76 },
+                { style: "JB2871", sam: 18.95 },
+                { style: "JB2876", sam: 21.38 },
+                { style: "JBG101", sam: 9.85 },
+                { style: "JUP003", sam: 3.09 },
+                { style: "JUP005", sam: 3.81 },
+            ];
+        }
+
+        // Populate style dropdown
+        function populateStyleDropdown(selectId) {
+            const selectElement = document.getElementById(selectId);
+            selectElement.innerHTML = '<option value="">-- เลือก Style --</option>';
+            
+            styleData.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.sam;
                 option.textContent = item.style;
                 option.dataset.sam = item.sam;
-                styleSelect.appendChild(option);
+                selectElement.appendChild(option);
             });
         }
 
         // Setup event listeners
         function setupEventListeners() {
-            document.getElementById('styleSelect').addEventListener('change', function() {
-                const samDisplay = document.getElementById('samDisplay');
-                if (this.value) {
-                    samDisplay.textContent = `SAM: ${this.value} นาที`;
-                    samDisplay.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
-                } else {
-                    samDisplay.textContent = 'กรุณาเลือก Style';
-                    samDisplay.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
+            // Style select change
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('style-select')) {
+                    const index = e.target.id.replace('styleSelect', '');
+                    const samDisplay = document.getElementById(`samDisplay${index}`);
+                    if (e.target.value) {
+                        samDisplay.textContent = `SAM: ${e.target.value} นาที`;
+                        samDisplay.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
+                    } else {
+                        samDisplay.textContent = 'กรุณาเลือก Style';
+                        samDisplay.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
+                    }
                 }
             });
 
-            // Auto-disable OT workers when OT hours is 0
+            // OT hours change
             document.getElementById('otHours').addEventListener('change', function() {
                 const otWorkersInput = document.getElementById('otWorkers');
                 if (this.value === '0') {
@@ -402,20 +558,112 @@
                     otWorkersInput.disabled = false;
                 }
             });
+
+            // Add style button
+            document.getElementById('addStyleBtn').addEventListener('click', addStyle);
+        }
+
+        // Add new style container
+        function addStyle() {
+            if (styleCount >= maxStyles) return;
+            
+            styleCount++;
+            const newIndex = styleCount - 1;
+            
+            const styleContainer = document.createElement('div');
+            styleContainer.className = 'style-container';
+            styleContainer.dataset.styleIndex = newIndex;
+            
+            styleContainer.innerHTML = `
+                <button class="remove-style-btn" onclick="removeStyle(${newIndex})">×</button>
+                <h4>Style งาน #${styleCount}</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="styleSelect${newIndex}">เลือก Style งาน</label>
+                        <select class="style-select" id="styleSelect${newIndex}">
+                            <option value="">-- เลือก Style --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ค่า SAM</label>
+                        <div class="sam-display" id="samDisplay${newIndex}">กรุณาเลือก Style</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="production${newIndex}">จำนวนชิ้นที่ผลิตได้</label>
+                        <input type="number" class="production-input" id="production${newIndex}" placeholder="จำนวนชิ้น" min="0">
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('styleContainers').appendChild(styleContainer);
+            populateStyleDropdown(`styleSelect${newIndex}`);
+            updateAddButtonState();
+        }
+
+        // Remove style container
+        function removeStyle(index) {
+            const container = document.querySelector(`.style-container[data-style-index="${index}"]`);
+            if (container) {
+                container.remove();
+                styleCount--;
+                
+                // Reindex remaining containers
+                const containers = document.querySelectorAll('.style-container');
+                containers.forEach((container, i) => {
+                    container.dataset.styleIndex = i;
+                    container.querySelector('h4').textContent = `Style งาน #${i + 1}`;
+                });
+                
+                updateAddButtonState();
+            }
+        }
+
+        // Update add button state
+        function updateAddButtonState() {
+            const addBtn = document.getElementById('addStyleBtn');
+            addBtn.disabled = styleCount >= maxStyles;
+            addBtn.style.opacity = styleCount >= maxStyles ? '0.5' : '1';
+            addBtn.style.cursor = styleCount >= maxStyles ? 'not-allowed' : 'pointer';
         }
 
         // Calculate efficiency
-        function calculateEfficiency() {
+        async function calculateEfficiency() {
             const workHours = parseFloat(document.getElementById('workHours').value);
             const otHours = parseFloat(document.getElementById('otHours').value);
             const regularWorkers = parseInt(document.getElementById('regularWorkers').value);
             const otWorkers = parseInt(document.getElementById('otWorkers').value) || 0;
-            const sam = parseFloat(document.getElementById('styleSelect').value);
-            const production = parseInt(document.getElementById('production').value);
-
+            
             // Validation
-            if (!regularWorkers || !sam || !production) {
-                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            if (!regularWorkers) {
+                alert('กรุณากรอกจำนวนพนักงานทำงานปกติ');
+                return;
+            }
+            
+            // Collect style data
+            const styles = [];
+            const styleContainers = document.querySelectorAll('.style-container');
+            
+            for (const container of styleContainers) {
+                const index = container.dataset.styleIndex;
+                const styleSelect = document.getElementById(`styleSelect${index}`);
+                const productionInput = document.getElementById(`production${index}`);
+                
+                if (!styleSelect.value || !productionInput.value) {
+                    alert(`กรุณากรอกข้อมูลให้ครบถ้วนสำหรับ Style งาน #${parseInt(index) + 1}`);
+                    return;
+                }
+                
+                styles.push({
+                    name: styleSelect.options[styleSelect.selectedIndex].text,
+                    sam: parseFloat(styleSelect.value),
+                    production: parseInt(productionInput.value)
+                });
+            }
+            
+            if (styles.length === 0) {
+                alert('กรุณาเพิ่ม Style งานอย่างน้อย 1 Style');
                 return;
             }
 
@@ -429,20 +677,59 @@
                 const regularMinutes = regularWorkers * workHours * 60;
                 const otMinutes = otWorkers * otHours * 60;
                 const totalMinutes = regularMinutes + otMinutes;
-
-                // Calculate current efficiency
-                const currentEfficiency = (sam * production / totalMinutes) * 100;
-
-                // Display current efficiency
-                document.getElementById('currentEff').textContent = currentEfficiency.toFixed(2) + '%';
-
-                // Calculate targets
-                calculateTargets(sam, totalMinutes, production, currentEfficiency);
-
+                
+                // Calculate efficiency for each style and overall
+                let totalSamProduction = 0;
+                const styleResults = [];
+                
+                styles.forEach(style => {
+                    const efficiency = (style.sam * style.production / totalMinutes) * 100;
+                    totalSamProduction += style.sam * style.production;
+                    styleResults.push({
+                        name: style.name,
+                        sam: style.sam,
+                        production: style.production,
+                        efficiency: efficiency
+                    });
+                });
+                
+                const overallEfficiency = (totalSamProduction / totalMinutes) * 100;
+                
+                // Display results
+                displayResults(styleResults, overallEfficiency, totalMinutes);
+                
                 // Show results
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('results').classList.remove('hidden');
             }, 1000);
+        }
+
+        // Display results
+        function displayResults(styleResults, overallEfficiency, totalMinutes) {
+            // Display overall efficiency
+            document.getElementById('currentEff').textContent = overallEfficiency.toFixed(2) + '%';
+            
+            // Display individual style results
+            const resultsContainer = document.getElementById('styleResultsContainer');
+            resultsContainer.innerHTML = '';
+            
+            styleResults.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'style-result-card';
+                card.innerHTML = `
+                    <div class="style-result-header">
+                        <div class="style-result-title">Style #${index + 1}: ${result.name}</div>
+                        <div class="style-result-sam">SAM: ${result.sam} นาที</div>
+                    </div>
+                    <div class="style-result-value">${result.efficiency.toFixed(2)}%</div>
+                    <div style="text-align: center; color: #666;">ผลิตได้ ${result.production} ชิ้น</div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+            
+            // Calculate targets based on the first style (or you can modify to use overall)
+            const primaryStyle = styleResults[0];
+            calculateTargets(primaryStyle.sam, totalMinutes, primaryStyle.production, primaryStyle.efficiency);
         }
 
         // Calculate target pieces needed for different efficiency levels
@@ -484,42 +771,31 @@
             });
         }
 
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', initializeApp);
-
         // Google Apps Script functions (for actual implementation)
         /*
-        function getStyleData() {
-            const sheet = SpreadsheetApp.openById('1gRFLcJ0gHtgNvruVs2UucAR4e5XBwkKLLpgP-NooyXM').getSheetByName('SAM');
-            const data = sheet.getDataRange().getValues();
-            const styleData = [];
-            
-            for (let i = 1; i < data.length; i++) { // Skip header row
-                styleData.push({
-                    style: data[i][0],
-                    sam: data[i][1]
-                });
-            }
-            
-            return styleData;
+        // Actual function to get style data from Google Sheet
+        async function getStyleDataFromSheet() {
+            return new Promise((resolve, reject) => {
+                google.script.run
+                    .withSuccessHandler(data => resolve(data))
+                    .withFailureHandler(error => reject(error))
+                    .getStyleData();
+            });
         }
-
-        function saveCalculationData(calculationData) {
-            const sheet = SpreadsheetApp.openById('1gRFLcJ0gHtgNvruVs2UucAR4e5XBwkKLLpgP-NooyXM').getSheetByName('Cal');
-            const newRow = [
-                calculationData.otHours,
-                calculationData.regularWorkers,
-                calculationData.otWorkers,
-                '', // Column D empty
-                calculationData.selectedStyle,
-                calculationData.sam,
-                calculationData.production,
-                calculationData.sam * calculationData.production,
-                calculationData.efficiency
-            ];
-            sheet.appendRow(newRow);
+        
+        // Actual function to save calculation data
+        async function saveCalculationData(calculationData) {
+            return new Promise((resolve, reject) => {
+                google.script.run
+                    .withSuccessHandler(() => resolve())
+                    .withFailureHandler(error => reject(error))
+                    .saveCalculationData(calculationData);
+            });
         }
         */
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
 </html>
