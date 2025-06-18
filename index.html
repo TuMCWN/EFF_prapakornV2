@@ -876,8 +876,8 @@
                         card.className = 'target-card';
                         card.innerHTML = `
                             <div class="target-percentage">${target}%</div>
-                            <div class="target-pieces">${neededProduction} ตัว</div>
-                            <div class="target-difference">เพิ่มอีก ${neededProduction - styles[0].production} ตัว</div>
+                            <div class="target-pieces"> เพิ่มอีก ${neededProduction} ตัว</div>
+                            <div class="target-difference">ผลรวม ${neededProduction + styles[0].production} ตัว</div>
                         `;
                         targetsGrid.appendChild(card);
                     }
