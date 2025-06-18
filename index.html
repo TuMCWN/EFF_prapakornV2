@@ -890,7 +890,7 @@
                     const neededProduction = Math.ceil((nearestTarget/100 * totalMinutes - totalSamProduction) / styles[0].sam);
                     
                     document.getElementById('alertText').textContent = `ประสิทธิภาพยังไม่ถึง ${nearestTarget}%!`;
-                    document.getElementById('alertDetail').textContent = `ต้องผลิตเพิ่มอีก ${neededProduction} ตัว เพื่อให้ได้ ${nearestTarget}%`;
+                    document.getElementById('alertDetail').textContent = `ต้องผลิต ${neededProduction + styles[0].production} ตัว เพื่อให้ได้ ${nearestTarget}%`;
                     
                     efficiencyAlert.classList.remove('hidden');
                 } else {
