@@ -632,8 +632,8 @@
         async function calculateEfficiency() {
             const workHours = parseFloat(document.getElementById('workHours').value);
             const otHours = parseFloat(document.getElementById('otHours').value);
-            const regularWorkers = parseInt(document.getElementById('regularWorkers').value);
-            const otWorkers = parseInt(document.getElementById('otWorkers').value) || 0;
+            const regularWorkers = parseFloat(document.getElementById('regularWorkers').value);
+            const otWorkers = parseFloat(document.getElementById('otWorkers').value) || 0;
             
             // Validation
             if (!regularWorkers) {
