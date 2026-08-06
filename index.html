@@ -854,7 +854,7 @@
                 const overallEfficiency = (totalSamProduction / totalMinutes) * 100;
                 
                 // Display overall efficiency
-                document.getElementById('currentEff').textContent = `${overallEfficiency.toFixed(3)}%`;
+                document.getElementById('currentEff').textContent = `${overallEfficiency.toFixed(4)}%`;
                 
                 // Display individual style results
                 const styleResultsContainer = document.getElementById('styleResultsContainer');
@@ -868,7 +868,7 @@
                             <div class="style-result-title">${style.name}</div>
                             <div class="style-result-sam">SAM: ${style.sam} นาที</div>
                         </div>
-                        <div class="style-result-value">${style.efficiency.toFixed(3)}%</div>
+                        <div class="style-result-value">${style.efficiency.toFixed(4)}%</div>
                         <div class="production-summary">ผลิตได้ ${style.production} ตัว</div>
                     `;
                     styleResultsContainer.appendChild(styleCard);
